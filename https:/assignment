@@ -11,6 +11,11 @@ if(a>b)
   {print("c>b>c");
 }}
 
+# a small tip for you: try coding in more standardized format, and that will help you to improve your debug efficiency when you have a huge project
+# when you are debugging a project with large quantities of code, and every sentence are written with the style of yours above, believe me you definitely want to kill this guy who write the code
+# the independent sentence should be written in a new row for better browse
+# the curly bracket should be aligned before and after codes 
+
 #2
 matrix_1 <- matrix(sample(0:50,50,replace=T), ncol=10, nrow=5)
 matrix_1
@@ -32,7 +37,13 @@ f<-function(x,y)
     mat<-matrix(0,nrow=dim(x)[1],ncol=dim(y)[2])  
     for(i in c(1:m))
       for(j in c(1:n))
-        mat[i,j]<-sum(x[i,]*y[,j])  
+        mat[i,j]<-sum(x[i,]*y[,j]) 
+        
+   # Edited in 10/19/2020  by Ming YANG
+   #  I don`t aggre with you by writting this assignment in this way
+   #  "sum(x[i,]*y[,j]" is also matrix multiplication calculation, so why not to write in x*y directly? it also can give an answer
+   #  I think you should write another for loop to calculate this 
+   
       return(mat)
   }
 }
@@ -40,39 +51,32 @@ f(matrix_1,matrix_2)
 #3
 k <- 100
 a <- matrix(0, nrow = k, ncol = k)
-
 a[, 1] = 1
-
 for (i in 1:k) {
-  
   a[i,i]=1
-  
 }
-
 for (i in 3:k) {
-  
   for (j in 2:(i - 1)) {
-    
     a[i, j] = a[i - 1, j] + a[i - 1, j - 1]
-    
   }
-  
 }
-
-
-
 for (i in 1:k) {
-  
-  for (j in 1:i) {
-    
+  for (j in 1:i) {  
     cat(sprintf("%3d", a[i,j]))
-    
   }
-  
   cat("\n")
-  
 }
 a [100,]
+
+################### Edited in 10/19/2020 by Ming YANG
+# several problems in this question
+# basically, your program design ideas are good,for generating Pascal Triangle matrix at first by iteration
+# my suggestion is that : 1) write this process into a function, making it more easy to read and re-use
+# you don`t have to save all the Pascal Triangle into one matrix, because that is not a matrix at all
+# all you need to do is just store the final vector of Pascal Triangle, and the previous data is useless, so you have no need to write it into the matrix 
+# if you still want to do this, try make post processing of output data, like cut the vector into the size it should be, instead of keep so many zeros in the matrix
+# good luck
+
 #4
 Least_steps <- function(x){ 
  steps=0 
@@ -86,6 +90,7 @@ Least_steps <- function(x){
  } 
  } 
  print(least_steps) 
+ # should print(steps)
  }
 #5
 library(gtools)
@@ -227,3 +232,30 @@ for(p in 1:filter_num){
   if(2010 %in% as.numeric(substr(Obs_Time2[p],1,4)) == TRUE ){
     if(filter_dis[p] < 5000){
       vis2010_5 = vis2010_5
+
+###########Edited in 10/19/2020  by Ming YANG
+# this is a recommended example for you to get better understanding of this question
+# you should finish this question by yourself after comprehending this resource
+# the dataset of "上海天气数据.csv" had uploaded in to the repo, check it!
+
+## 读取数据
+weather <- read.csv("上海天气数据.csv",header = T)
+chinaweather <- data.frame(weather)
+## 查看我们的数据
+summary(chinaweather)
+
+weather_rm_missing <- weather[which(!is.na(weather$temperature)),] #rm na
+weather_rm_badPoint <- weather[which(weather_rm_missing<=-30),] #rm low quality
+
+##7.2 [5 points] Plot the time series of a certain variable.
+
+plot(weather$temperature, lwd=0.5,
+     xlab = "month 12 of 2015",ylab="Temperature",type="l")
+
+##7.3 [5 points] Conduct at least 5 simple statistical 
+##checks with the variable, and report your findings.
+min(weather$temperature,na.rm = T) 
+max(weather$temperature,na.rm = T) 
+table(weather$temperature)
+mean(weather$temperature,na.rm = T) 
+median(weather$temperature,na.rm = T)
