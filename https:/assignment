@@ -1,0 +1,229 @@
+#1
+if(a>b)
+  {{if(b>c){print("a>b>c");}
+  else
+    {if(a>c)print("a>c>b");}
+  else
+{if print("c>a>b");}
+  else
+  {if(a>c){print("b>c>a");}
+  else
+  {print("c>b>c");
+}}
+
+#2
+matrix_1 <- matrix(sample(0:50,50,replace=T), ncol=10, nrow=5)
+matrix_1
+matrix_2 <- matrix(sample(0:50,50,replace=T), ncol=5, nrow=10)
+matrix_2
+f<-function(x,y)
+{
+  xcol<-dim(x)[2]
+  yrow<-dim(y)[1] 
+  m<-dim(x)[1]
+  n<-dim(y)[2]
+  if(xcol!=yrow)  
+  {
+    print("error")
+    return(0)
+  }
+  else 
+  {
+    mat<-matrix(0,nrow=dim(x)[1],ncol=dim(y)[2])  
+    for(i in c(1:m))
+      for(j in c(1:n))
+        mat[i,j]<-sum(x[i,]*y[,j])  
+      return(mat)
+  }
+}
+f(matrix_1,matrix_2)
+#3
+k <- 100
+a <- matrix(0, nrow = k, ncol = k)
+
+a[, 1] = 1
+
+for (i in 1:k) {
+  
+  a[i,i]=1
+  
+}
+
+for (i in 3:k) {
+  
+  for (j in 2:(i - 1)) {
+    
+    a[i, j] = a[i - 1, j] + a[i - 1, j - 1]
+    
+  }
+  
+}
+
+
+
+for (i in 1:k) {
+  
+  for (j in 1:i) {
+    
+    cat(sprintf("%3d", a[i,j]))
+    
+  }
+  
+  cat("\n")
+  
+}
+a [100,]
+#4
+Least_steps <- function(x){ 
+ steps=0 
+ while (x !=1) { 
+ if(x%%2 == 1){ 
+ x <- x-1 
+ steps <- steps + 1 
+   }else{ 
+ x <- x/2 
+ steps <- steps + 1 
+ } 
+ } 
+ print(least_steps) 
+ }
+#5
+library(gtools)
+input <- as.integer(runif(1,1,100))
+Find_expression <- function(input){
+  
+  symbol <- c("+","-","")
+  symbols <- permutations(3,8,symbol, repeats.allowed = TRUE)
+  symbols <- cbind(symbols,"")
+  num <- matrix(seq(1,9,by = 1),9,6561)
+  num <- t(num)
+  equa <- matrix("",6561,1)
+  for( row in 1:6561 ){
+    symbol1 <- c(symbols[row,])
+    num1 <- c(num[row,])
+    equa[row,] <- paste(num1,symbol1,sep = "",collapse = "")
+  }
+  count <- 0
+  for( row in 1:6561 ){
+    ans <- eval(parse(text = equa[row]))
+    if (ans == input){
+      print (equa[row])
+      count <- count+1
+    }
+  }
+  return(count)
+}
+#5.2
+Total_solutions <- matrix(0,100,1)
+for (input in 1:100){
+  Total_solutions[input,]<- Find_expression(input)
+}
+plot(x = 1:100, y = Total_solutions,type = "l",)
+maxnum = which(Total_solutions == max(Total_solutions))
+minnum = which(Total_solutions == min(Total_solutions))
+sprintf("%d yields the maximum of Total_solutions.", maxnum)
+sprintf("%d yields the minimum of Total_solutions.", minnum)
+
+#6
+data <- read.csv('2281305.csv')
+data_vis <- data$VIS
+print(data_vis)
+num=length(data_vis)
+print(num)
+distance <- list()
+dis_qua <- list()
+vari_code <- list()
+qua_vari_code <- list()
+del_label <-c()
+print(distance[29254])
+for(i in 1:num){
+  distance[i] <- as.numeric(substr(data_vis[i:i],1,6))
+  dis_qua[i] <- substr(data_vis[i:i],8,8)
+  vari_code[i] <- substr(data_vis[i:i],10,10)
+  qua_vari_code[i] <-substr(data_vis[i:i],12,12)
+  
+}
+print(distance[29254])
+for (j in 1:num){
+  if (distance[j] <0 | distance[j]>160000 ){ 
+    del_label= c(del_label,j)
+  }
+}
+print(length(del_label))
+
+for (t in 1:num){
+  if (dis_qua[t] != '1' | vari_code[t] !='N' | qua_vari_code[t] != '1'){ 
+    del_label= c(del_label,t)
+  }
+}
+print(length(del_label))    
+data_vis3=data_vis[-del_label]   #获取到过滤后的数据
+data_all_filter=data[-del_label]
+print(length(data_all_filter))
+#获取过滤后的可见性数据（距离）
+filter_dis <- list()
+filter_num=length(data_vis3)
+for (d in 1: filter_num ){
+  filter_dis[d] <- as.numeric(substr(data_vis3[d:d],1,6))
+}
+print(filter_dis)
+
+#获取时间
+
+Obs_Time = data_all_filter$DATE
+print(length(Obs_Time))
+Obs_Time <- Obs_Time[-del_label]
+print(length(Obs_Time))
+
+Obs_Time2=as.Date(Obs_Time)
+
+#绘图
+plot(Obs_Time2,filter_dis,lwd=0.5,type='l',col='blue')
+
+# 只有过去三年三年的数据，过去三年的数据里每年都有一个周期性的变化。
+#年初能见度的距离数值比较低，然后组建上升年中达到顶峰，之后又下降。
+#春冬季节能见度低，夏秋季节比较高。
+
+print(Obs_Time2[1])
+2013 %in% as.numeric(substr(Obs_Time2[29000],1,4))
+print(filter_dis[29000])
+2600 %in% filter_dis[2]
+
+#6.2
+vis2010_5 <- 0
+vis2010_10 <- 0
+vis2010_15 <- 0
+vis2010_20 <- 0
+vis2010_25 <- 0
+vis2010_30 <- 0
+vis2010_30_ <- 0
+
+vis2011_5 <- 0
+vis2011_10 <- 0
+vis2011_15 <- 0
+vis2011_20 <- 0
+vis2011_25 <- 0
+vis2011_30 <- 0
+vis2011_30_ <- 0
+
+vis2012_5 <- 0
+vis2012_10 <- 0
+vis2012_15 <- 0
+vis2012_20 <- 0
+vis2012_25 <- 0
+vis2012_30 <- 0
+vis2012_30_ <- 0
+
+vis2013_5 <- 0
+vis2013_10 <- 0
+vis2013_15 <- 0
+vis2013_20 <- 0
+vis2013_25 <- 0
+vis2013_30 <- 0
+vis2013_30_ <- 0
+
+for(p in 1:filter_num){
+  
+  if(2010 %in% as.numeric(substr(Obs_Time2[p],1,4)) == TRUE ){
+    if(filter_dis[p] < 5000){
+      vis2010_5 = vis2010_5
