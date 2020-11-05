@@ -1,0 +1,85 @@
+#1
+data<-data.frame(day=c(1:26),RFSD=c(2745.6, 1697.1, 1656.4, 978.0, 703.4, 489.1, 430.0, 334.1, 302.8, 274.7, 274.7, 255.0, 242.5, 200.7, 198.6, 129.6, 119.0, 118.3, 115.3, 92.4, 40.6, 32.7, 31.4, 17.5, 7.7, 4.1),RFUD=c(1202.6, 830.1, 372.4, 345.5, 321.2, 244.3, 163.0, 147.8, 95.0, 87.0, 81.2, 68.5, 47.3, 41.1, 36.6, 29.0, 28.6, 26.3, 26.0, 24.4, 21.4, 17.3, 11.5, 4.9, 4.9, 1.0))
+data_tbl<-as_tibble(data)
+data_tbl
+ggplot(data_tbl,aes(x = day, y = RFSD, fill = day)) +
+  geom_boxplot() +
+  theme_classic()
+ggplot(data_tbl,aes(x = day, y = RFUD, fill = day)) +
+  geom_boxplot() +
+  theme_classic()
+anova_one_way <- aov(RFUD ~ RFSD , data = data_tbl)
+summary(anova_one_way)
+
+#2
+data <- read.csv(file = "PS3_data.csv", header = T)
+data%>%
+select(Bone_type,OIC)%>%
+  group_by(Bone_type)%>%
+  summarize(OIC_mean = mean(OIC))%>%
+ggplot(aes(x = Bone_type, y = OIC_mean, fill = Bone_type)) +
+  geom_boxplot() +
+  theme_classic()
+anova_one_way <- aov(Bone ~ OIC_mean , data = data)
+summary(anova_one_way)
+#3
+data <- read.csv(file = "PS3_data.csv", header = T)
+data%>%
+  select(people_type,zine_level)%>%
+  group_by(people_type)%>%
+  summarize(zine_mean = mean(zine_level))
+  ggplot( aes(x=people_type, y=zine_level) ) + 
+  geom_point()
+#4
+x <- c(180,305,381,488,549,640,762,883)
+y <- c(13.3,12.2,13.3,10.0,8.3,9.4,8.3,7.2)
+plot(x,y)
+abline(fit,  col = "red")
+fit <- lm(y ~ x)
+summary(fit)
+#5
+#5.1
+data <- read.csv(file = "PS3_data.csv", header = T)
+data%>%
+select(Velocity,Distance)%>%
+ggplot(aes(x=Velocity, y=Distance) ) +
+geom_point()
+#5.2
+data <- read.csv(file = "PS3_data.csv", header = T)
+data%>%
+select(Velocity,Distance)%>%
+ggplot(aes(x=Velocity, y=Distance) ) +
+geom_smooth(method = "lm",  color="black",formula= y~x) +
+geom_point()
+fit <- lm(y ~ x)
+summary(fit)
+#6
+library(MASS)
+library(leaps)
+data(cpus)
+n <- nrow(data)
+mark <- rep(FALSE, n)
+mark[sample(n, round(4*n/5))] <- TRUE
+training.set <- data[mark, ]
+test.set <- data[!mark, ]
+subset_result <- regsubsets(perf~syct+mmin+mmax+cach+chmin+chmax, data=training.set, nbest=2, nvmax = 6)
+plot(subset_result, scale="bic")
+#7
+#没找到比较适合的数据，用R语言自带的plantgrowth
+PlantGrowth
+ctr1_w <- PlantGrowth%>%
+filter(group=="ctrl")%>%
+pull(weight)
+ctr1_w
+trt1_w<- PlantGrowth%>%
+  filter(group=="trt1")%>%
+  pull(weight)
+trt1_w
+t.test(ctr1_w,trt1_w)
+#7.2
+anova_one_way <- aov(trt1_w ~ trt2_w)
+summary(anova_one_way)
+#7.3
+plot(trt2_w,ctr1_w)
+fit <- lm(y ~ x)
+summary(fit)
