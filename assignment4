@@ -1,0 +1,52 @@
+#1.1
+gapminder %>%
+  ggplot(aes(x = continent, y = pop, fill = continent)) +
+  geom_boxplot() +
+  theme_classic()
+  #1.2
+pop <- ts(gapminder$pop,frequency=12)
+plot(pop, type="l")
+#1.3
+ggplot(gapminder,aes(x=year, y=pop)) + geom_bar(stat="identity")
+ggplot(gapminder,aes(x=factor(year), y=pop)) + geom_bar(stat="identity")
+#1.4
+ggplot(gapminder,aes(x=year, y=pop,color=continent) ) + 
+  geom_point()
+#1.5
+library(maps)
+data("world.cities")
+bigcities <- subset(world.cities, pop > 5000000)
+qplot(long, lat, data = bigcities,colour=country.etc,size=pop)+ borders("world", size= 0.5)
+#2.1
+data <- read.csv("2281305.csv",header = T)
+data_tbl <- as_tibble(data)
+data_tbl %>%
+  filter(TMP != "+9999") %>%
+  mutate(date1 = substr(DATE,1,7), tmp = as.numeric(substr(TMP,3,5))/10) %>%
+  group_by(date1) %>%
+  summarise(Tmean = mean(tmp))
+temperture_ts <- ts(data$Tmean, start=c(2010,1), frequency = 12)
+plot(temperture_ts, type = "l")
+#2.2
+temperture_components <- decompose(temperture_ts)
+plot(temperture_components)
+
+#2.3
+acf(temperture_ts)
+pacf(temperture_ts)
+library(forecast)
+model_arima <- auto.arima(temperture_ts)
+
+#2.4
+data_t <- data %>%
+  filter(date1 < "2020-08")
+temperture_ts2 <- ts(data_t$Tmean, start=c(2010,1), frequency = 12)
+model_arima2 <- auto.arima(temperture_ts2)
+meanT_forecast <- 5
+month_in_plot <- 30
+forecast_2meanT <- forecast(model_arima2, meanT_forecast)
+plot(forecast(model_arima2, meanT_forecast), include = month_in_plot, xlab = "time", ylab = "mean_temperture")
+data %>%
+  filter(date1 > "2020-08") 
+forecast_2meanT$mean[1] 
+forecast_2meanT$mean[2] 
