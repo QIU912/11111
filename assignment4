@@ -3,6 +3,11 @@ gapminder %>%
   ggplot(aes(x = continent, y = pop, fill = continent)) +
   geom_boxplot() +
   theme_classic()
+  
+# MingYANG noticed:
+# it is not clear and aesthetic, maybe you can transform height(y-axis) as log data
+# the end 
+
   #1.2
 pop <- ts(gapminder$pop,frequency=12)
 plot(pop, type="l")
