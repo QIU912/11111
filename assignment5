@@ -67,3 +67,8 @@ srad_china<-crop(srad_year,China)
 srad_china <- mask(srad_china,China,na.rm=T)
 plot(srad_china,  main="srad in china", col=col)
 contour(srad_china, add=T,levels=16000, col="red")
+
+# MingYANG noticed:
+# report of this part is missing
+# detail informations of 1.3&1.4 are also missing
+# the end
