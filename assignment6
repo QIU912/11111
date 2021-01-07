@@ -1,0 +1,208 @@
+program Main 
+implicit none
+
+integer:: u,v,i,j,n
+
+real(4),
+
+dimension(:,:),
+allocatable  ::  a,b,c
+
+u=50
+v=60
+open(unit=u,file='M.dat',status='old')
+open(unit=v,file='N.dat',status='old')
+n=3
+
+allocate( a(n,n),b(n,n),c(n,n) )
+j=1
+do i =1,3
+read(u,*)a(i,j),a(i,j+1),a(i,j+2)
+read(v,*)b(i,j),b(i,j+1),b(i,j+2)
+enddo
+
+close(u)
+close(v)
+
+call Matrix_multip(a,b,c,n)
+open(unit=u,file='MN.dat',status='replace')
+
+do i=1,n
+write(u,'(f8.1,f8.1,f8.1)') c(i,j),c(i,j+1),c(i,j+2)
+enddo
+close(u)
+
+do i=1,n
+
+write(*,*)"the answer:"
+write(*,*)"line",i,":",c(i,j),c(i,j+1),c(i,j+2)
+enddo
+
+deallocate(a,b,c)
+
+end program Main
+
+
+Matrix_multip.f90
+
+subroutine Matrix_multip(a,b,c,n)
+implicit none
+integer                 ::n
+real(4),dimension(n,n)  ::a,b,c
+c = matmul(a,b)
+return
+end
+
+
+AST.f90
+
+module AST
+
+implicit none
+
+real,parameter ::pi=3.1415926536
+
+contains
+
+function astime(long,direct,dmt,year,hour,min,day)
+logical direct
+integer astime(2),dmt,year,hour,min,day,lstm,temp
+real d,et,long,tt
+
+if (((mod(year,4)==0).and.(mod(year,100)/=0)) .or. (mod(year,400)==0)) then
+d=360*(dble(day)-81)/366
+else
+d=360*(dble(day)-81)/365
+end if
+et=9.87*sin(2*d*pi/180)-7.53*cos(d*pi/180)-1.5*sin(d*pi/180)
+if (direct.eqv..true.) then
+long=-long
+else
+long=long
+endif
+lstm=15*dmt
+temp=4*(long-lstm)+et
+astime(1)=hour+int(temp/60)
+astime(2)= min+mod(temp,60)
+
+if (astime(2)>60) then
+astime(1) = astime(1) +1
+astime(2) = astime(2)-60
+elseif(astime(2)<0) then
+astime(1)= astime(1)+1
+astime(2)= astime(2)-60
+elseif(astime(2)<0) then
+astime(1)=astime(1)-1
+astime(2)=60+astime(2)
+else
+astime(1)=astime(1)
+astime(2)=astime(2)
+endif
+if (astime(1)>=24) then
+astime(1)=astime(1)-24
+else
+astime(1)=astime(1)
+endif
+print*,"D =",d
+print*,"ET =",et
+print*,"LSTM =",lstm
+end function astime
+end module AST
+
+
+Cal_SZA.f90
+program FunctionTest
+use Declination_angle
+use AST
+implicit none
+
+logical direct
+integer dmt,year,month,date,hour,min,day,apparentst(2)
+real p,da,long,lat,h,saa,sza
+
+p=3.1415926536
+write(*,*)"Please input the year:"
+read (*,*) year
+
+write(*,*)"Please input the month:"
+read (*,*) month
+
+write(*,*)"Please input the date:"
+read (*,*) date
+
+write(*,*)"Please input the hour:"
+read (*,*) hour
+
+write(*,*)"Please input the minute:"
+read (*,*) min
+
+write(*,*)"Please input the time zone(West-12----+12East):"
+read (*,*) dmt
+
+write(*,*)'In the western longitudes?(please input ".true."or".false."):'
+read (*,*) direct
+
+write(*,*)"Please input the Longitude:"
+read (*,*) long
+
+write(*,*)"Please input the Latitude:"
+read (*,*) lat
+day = daysinyear(year,month,date)
+write(*,*) "The day in this year is:",day
+
+da=DecAngle(year,day)
+write(*,*)"The declination angle is:",da,"Deg"
+
+apparentst= astime(long,direct,dmt,year,hour,min,day)
+write(*,*)"The apparentst solar time(AST) is :",apparentst(1),":",apparentst(2)
+
+h=((60*dble(apparentst(1))+dble(apparentst(2))) - 720)/4
+write(*,*)"The hour angle(H) is:",h
+
+saa = asin(cos(lat*p/180)*cos(da*p/180)*cos(h*p/180)+sin(lat*p/180)*sin(da*p/180))
+
+saa = saa*180/p
+write(*,*)"The altitude angle is:",saa
+
+sza=90-saa
+write(*,*)"The zenith angle(SZA) is:",sza
+
+end program FunctionTest
+
+
+
+
+
+Declination_angle.f90
+module Declination_angle
+
+implicit none
+
+real,parameter:: pi = 3.1415926536
+
+contains
+integer function daysinyear(year,month,day)
+integer::year,month,day
+integer:: daysinmonth(12) = [31,28,31,30,31,30,31,31,30,31,30,31]
+if (((mod(year,4)==0).and.(mod(year,100)/=0)).or.(mod(year,400)==0)) then
+daysinmonth(2)=29
+else
+daysinmonth(2)=28
+end if
+daysinyear = sum(daysinmonth(:month-1))+day
+
+end function daysinyear
+
+real function decangle (year,n)
+integer year,n
+real temp
+
+if (((mod(year,4)==0).and.(mod(year,100)/=0)).or.(mod(year,400)==0)) then
+temp = (n+284)*360*pi/(366*180)
+else
+temp = (n+284)*360*pi/(365*180)
+end if
+decangle = 23.45*sin(temp)
+end function decangle
+end module Declination_angle
+
