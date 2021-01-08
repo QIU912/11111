@@ -8,6 +8,8 @@ real(4),
 dimension(:,:),
 allocatable  ::  a,b,c
 
+! MingYANG : good with dynamic matrix
+
 u=50
 v=60
 open(unit=u,file='M.dat',status='old')
@@ -52,7 +54,11 @@ real(4),dimension(n,n)  ::a,b,c
 c = matmul(a,b)
 return
 end
-
+! MingYANG noticed:
+! (1) in this question, M and N are not all in n×n
+! (2) using "matmul" can`t get the right answer(and where is your answer? I can`t obtain it)
+! (3) please write the answer with the format of "(f8.1)"
+! the end
 
 AST.f90
 
