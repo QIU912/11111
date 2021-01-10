@@ -1,0 +1,131 @@
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+Data <- read.csv(file = "FAO.csv", header = T)
+Data_tbl <- as_tibble(Data)
+head(Data_tbl) 
+Data_tbl%>% 
+  l <- subset(Data_tbl,Leopard.flag =Y)
+qplot(Longitude, Latitude, data = Data_tbl,colour=Country,size=Leopard.flag)+ borders("world")
+  select(Country,Date...start.of.date.range,Total.number.of.tigers..skins..live..carcass..stuffed...)%>%
+  filter(Total.number.of.tigers..skins..live..carcass..stuffed... > 0)%>%
+  mutate(date = as.Date(Date...start.of.date.range),tt=as.numeric(Total.number.of.tigers..skins..live..carcass..stuffed...))%>%
+  group_by(Country)%>%
+  summarize(trade_sum = sum(tt))%>%
+  ggplot(aes(x=Country,y=trade_sum,color=Country) ) + geom_bar(stat='identity' ,fill='white')
+arrange(desc(trade_sum)) 
+Data <- read.csv(file = "FAO.csv", header = T)
+Data_tbl <- as_tibble(Data)
+Data_tbl%>%          
+  select(Transit.type)%>%
+  filter(Transit.type == "By rail")%>%
+  count(Transit.type)%>%
+Data_tbl%>%          
+  select(Transit.type)%>%
+  filter(Transit.type == "By road")%>%
+  count(Transit.type)
+Data_tbl%>%          
+  select(Transit.type)%>%
+  filter(Transit.type == "By air")%>%
+  count(Transit.type)
+Data_tbl%>%          
+  select(Transit.type)%>%
+  filter(Transit.type == "By river")%>%
+  count(Transit.type)
+Data_tbl%>%          
+  select(Transit.type)%>%
+  filter(Transit.type == "By post")%>%
+  count(Transit.type)
+
+df1 <- data.frame(group = c("rail","road","post","air","river"),value = c(17,182,17,28,2))
+head(df1)
+p<- ggplot(df1, aes(x="", y=value, fill=group))+
+  geom_bar(width = 1, stat = "identity")
+p
+pie <- p + coord_polar("y",start=0)
+pie
+
+  ggplot(aes(x=Country,y=trade_sum,color=Country) ) + geom_bar(stat='identity' ,fill='white')
+
+library(maps)
+t <- subset(Data_tbl,Tiger.flag =Y)
+tp<- qplot(Longitude, Latitude, data = Data_tbl,colour=Country,size=Tiger.flag)+ borders("world", size= 0.5)
+l <- subset(Data_tbl,Leopard.flag =Y)
+lp<- qplot(Longitude, Latitude, data = Data_tbl,colour=Country,size=Leopard.flag)+ borders("world")
+sl <- subset(Data_tbl,Snow.leopard.flag =Y)
+qplot(Longitude, Latitude, data = Data_tbl,colour=Country,size=Snow.leopard.flag)+ borders("world")
+Cl <- subset(Data_tbl,Clouded.leopard.flag =Y)
+qplot(Longitude, Latitude, data = Data_tbl,colour=Country,size=Clouded.leopard.flag)+ borders("world")
+
+
+
+skin <- sum(Data_tbl$Tiger.skin,na.rm = T)
+carcass <- sum(Data_tbl$Tiger.carcass,na.rm = T)
+live <- sum(Data_tbl$Tiger.live,na.rm = T)
+stuffed <- sum(Data_tbl$Tiger.stuffed...mounted,na.rm = T)
+bone.n <- sum(Data_tbl$Tiger.bone..number.,na.rm = T)
+skull.n <- sum(Data_tbl$Tiger.skull.number,na.rm = T)
+skeleton <- sum(Data_tbl$Tiger.skeleton,na.rm = T)
+claws.n <- sum(Data_tbl$Tiger.claws.number,na.rm = T)
+paw <- sum(Data_tbl$Tiger.paw,na.rm = T)
+tooth <- sum(Data_tbl$Tiger.tooth,na.rm = T)
+whisker <- sum(Data_tbl$Tiger.whisker,na.rm = T)
+carcass <- sum(Data_tbl$Tiger.carcass,na.rm = T)
+
+df <- data.frame(group = c("carcass", "live", "stuffed","bone.n","skull.n","skeleton","claws.n","paw","tooth","whisker"),value = c(carcass, live, stuffed,bone.n,skull.n,skeleton,claws.n,paw,tooth,whisker))
+head(df)
+
+p1<- ggplot(df, aes(x="", y=value, fill=group))+
+  geom_bar(width = 1, stat = "identity")
+p1
+pie <- p1 + coord_polar("y",start=0)
+pie
+Data <- read.csv(file = "FAO.csv", header = T)
+Data_tbl <- as_tibble(Data)
+trade_ts <-  Data_tbl%>%
+select(Country,Date...start.of.date.range,Total.number.of.tigers..skins..live..carcass..stuffed...)%>%
+filter(Total.number.of.tigers..skins..live..carcass..stuffed... > 0)%>%
+mutate(date = as.Date(Date...start.of.date.range),date1=substr(date,1,7),tt=as.numeric(Total.number.of.tigers..skins..live..carcass..stuffed...))%>%
+group_by(date1)%>%
+summarize(m_mean = mean(tt))
+trade_ts <-ts(trade_ts$m_mean, start=c(2000,1), frequency = 12)
+plot(trade_ts)
+trade_components <- decompose(trade_ts)
+plot(trade_components)
+library(forecast)
+ts.stl <- stl(trade_ts,"periodic")  # decompose the TS
+ts.sa <- seasadj(ts.stl)  # de-seasonalize
+plot(trade_ts, type="l")  # original series
+plot(ts.sa, type="l")  # seasonal adjusted
+seasonplot(ts.sa, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: trade_ts")
+acf(ts.sa)
+pacf(ts.sa)
+library(tseries)
+adf.test(ts.sa)
+model_arima <- auto.arima(ts.sa)
+model_arima
+m_mean_forecast <- 5
+month_in_plot <- 30
+forecast_mean <- forecast(model_arima, m_mean_forecast)
+plot(forecast(model_arima, m_mean_forecast), include = month_in_plot, xlab = "time", ylab = "m_mean")
+
+trade_ls <-  Data_tbl%>%
+  select(Country,Date...start.of.date.range,Total.number.of.leopards..skins..live..carcasses..stuffed... )%>%
+  filter(Total.number.of.leopards..skins..live..carcasses..stuffed...  > 0)%>%
+  mutate(date = as.Date(Date...start.of.date.range),date1=substr(date,1,7),tl=as.numeric(Total.number.of.leopards..skins..live..carcasses..stuffed... ))%>%
+  group_by(date1)%>%
+  summarize(m_mean = mean(tl))
+trade_ls <-ts(trade_ls$m_mean, start=c(2000,1), frequency = 12)
+scatter.smooth(x=trade_ls, y=trade_ts,xlim=c(0,30), ylim=c(0,30), main="l ~t ")
+
+length(trade_ls)
+length(trade_ts)
+trade_t=as.numeric(trade_ts)
+trade_l=as.numeric(trade_ls)
+trade_t1 <- as.data.frame(trade_t)
+trade_l1 <- as.data.frame(trade_l)
+trade <- merge(trade_l1,trade_t1)
+fit <- lm(trade$trade_1 ~ trade$trade_t)
+plot(trade_ls,trade_ts,xlim=c(0,30), ylim=c(0,30),abline(fit, lwd = 5, col = "red"))
+
